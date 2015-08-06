@@ -1,0 +1,26 @@
+============================================================
+      nuEI: An interface for a neutrino event in nuCD
+============================================================
+
+
+Dependencies
+------------
+- ROOT version 5.34 or newer
+- Scons version 1.0.0 or newer (to compile and build library [http://www.scons.org/])
+- Python version 1.5.2 or newer(Scons dependency)
+
+Installation
+------------
+
+In order to build nuEI just type:
+
+scons install
+
+or, if you prefer to install it in some folder of your choice:
+
+scons PREFIX=/path/to/installation/folder install
+
+The building creates an nuei-config file in the bin directory under the installation path. Make sure you add
+/path/to/installation/folder/bin to your $PATH variable and then check your installation by doing
+
+nuei-config

@@ -1,4 +1,3 @@
-
 ///////////////////////////////////////////////////////////////////////////////
 ////
 ////  @Author   Gonzalo Martínez Lema
@@ -104,8 +103,8 @@ namespace nuEI
 
   void Event::Info(ostream& s) const
   {
-    s << std::endl;
-    s << "Event number:         " << GetID() << std::endl;
+    s << std::endl
+      << "Event number:         " << _eventID << std::endl;
 
     int Nhits=0;
     for ( int it=0; it<=(int)_tracks->GetLast(); ++it)
@@ -114,7 +113,7 @@ namespace nuEI
       Nhits += track->GetHits().size();
     }
 
-    s << "Number of true hits:  " << Nits << std::endl;
+    s << "Number of true hits:  " << Nhits                     << std::endl;
     s << "Number of sensor hits " << _sensor_hits->GetLast()+1 << std::endl;
     s << "Number of particles   " << _particles()->GetLast()+1 << std::endl;
 

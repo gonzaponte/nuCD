@@ -18,6 +18,7 @@
 #include <TLorentzVector.h>
 #include <TRef.h>
 #include <TRefArray.h>
+#include <TDatabasePDG.h>
 
 namespace nuEI { class Track; }
 

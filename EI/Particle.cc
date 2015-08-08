@@ -12,6 +12,7 @@
 #include "Track.hh"
 
 #include <iostream>
+#include <TParticlePDG.h>
 
 ClassImp(nuEI::Particle);
 

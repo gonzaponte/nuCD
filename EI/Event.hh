@@ -71,7 +71,7 @@ namespace nuEI
 
     ClassDef(Event,1);
 
-  };
+  }; // class Event
 
   // INLINE methods
   inline const TObjArray* Event::GetSensorHits() const {return _sensor_hits;}

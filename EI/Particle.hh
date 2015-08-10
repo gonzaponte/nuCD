@@ -18,9 +18,12 @@
 #include <TLorentzVector.h>
 #include <TRef.h>
 #include <TRefArray.h>
-#include <TDatabasePDG.h>
 
-namespace nuEI { class Track; }
+namespace nuEI
+{
+  class Track;
+  class Database;
+}
 
 namespace nuEI
 {
@@ -53,7 +56,7 @@ namespace nuEI
     TLorentzVector _initial_momentum; // initial momentum and energy
     TLorentzVector _decay_momentum;   // final momentum and energy
 
-    std::string _initial_volume;       // name of the volume where the particle was created
+    std::string _initial_volume;      // name of the volume where the particle was created
     std::string _decay_volume;        // name of the volume where the particle decays
     std::string _creator_process;     // name of the process by which the particle was created
 
@@ -61,7 +64,7 @@ namespace nuEI
     TRefArray _tracks;                // reference to the true hits made by the particle
     TRefArray _daughters;             // array of references to the secondary particles comming from this one
 
-    TDatabasePDG _PDG_manager;        // Interface with PDG database
+    Database _PDG_manager;           // Interface with PDG database
 
     AddProperties();                  // Set properties from PDG database
   public:

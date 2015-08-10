@@ -12,7 +12,7 @@
 #include "Track.hh"
 
 #include <iostream>
-#include <TParticlePDG.h>
+#include <Database.hh>
 
 ClassImp(nuEI::Particle);
 
@@ -47,7 +47,7 @@ namespace nuEI
   _mother(0), _tracks(0), _daughters(0),
   _PDG_manager()
   {
-    int code = _PDG_manager.GetParticle(name)->PdgCode();
+    int code = _PDG_manager.GetPDGcode(name);
     *this = Particle(code);
   }
 
@@ -64,11 +64,10 @@ namespace nuEI
 
   void Particle::AddProperties()
   {
-    TParticlePDG* PDGparticle = (TParticlePDG*) _PDG_manager.GetParticle(_PDGcode);
-    _name     = PDGparticle->GetName();
-    _mass     = PDGparticle->Mass();
-    _charge   = PDGparticle->Charge();
-    _lifetime = PDGparticle->Lifetime();
+    _name     = _PDG_manager.GetName(_PDGcode);
+    _mass     = _PDG_manager.GetMass(_PDGcode);
+    _charge   = _PDG_manager.GetCharge(_PDGcode);
+    _lifetime = _PDG_manager.GetLifetime(_PDGcode);
   }
 
   const Particle* Particle::GetMother() const
@@ -81,112 +80,6 @@ namespace nuEI
 
     return dynamic_cast<Particle*> (_mother.GetObject());
   }
-  //
-  // Particle* Particle::GetMother()
-  // {
-  //   if (!_mother.GetObject()) {
-  //     std::cerr << "[ERROR: nuEI::Particle::GetMother()]:"
-  //   		<< " the particle is primary, it has no mother!" << std::endl;
-  //   }
-  //   return dynamic_cast<Particle*> (_mother.GetObject());
-  // }
-
-  // Track* Particle::GetTrack(const std::string& det)
-  // {
-  //   for (int i=0; i< _tracks.GetLast()+1; ++i) {
-  //     Track* tr = (Track*)_tracks.At(i);
-  //     if (tr->GetDetectorName() == det) {
-	//  return tr;
-  //     }
-  //   }
-  //   // std::cerr << "[ERROR: nuEI::Particle::GetTrack()]:"
-  //   // 	      << " the particle doesn't have hits from detector "
-  //   // 	      << det << std::endl;
-  //   return 0;
-  //
-  // }
-
-  // void Particle::SetName(int code)
-  // {
-  //   if (code == 22) {
-  //     _name = "gamma";
-  //     SetParameters(0,0,-1);
-  //   } else if (code == -11) {
-  //     _name = "e+";
-  //     SetParameters(5.10998902E-04*GeV,1,-1);
-  //   } else if (code == 11) {
-  //     _name = "e-";
-  //     SetParameters(5.10998902E-04*GeV,-1,-1);
-  //   } else if (code == -13) {
-  //     _name = "mu+";
-  //     SetParameters(1.05658357E-01*GeV,1,2.197e-6*second);
-  //   } else if (code == 13) {
-  //     _name = "mu-";
-  //     SetParameters(1.05658357E-01*GeV,1,2.197e-6*second);
-  //   } else if (code == -15) {
-  //     _name = "tau+";
-  //     SetParameters(1.77699*GeV,1,291e-15*second);
-  //   } else if (code == 15) {
-  //     _name = "tau-";
-  //     SetParameters(1.77699*GeV,-1,291e-15*second);
-  //   } else if (code == 12) {
-  //     _name = "nu_e";
-  //     SetParameters(0,0,-1);
-  //   } else if (code == -12) {
-  //     _name = "anti_nu_e";
-  //     SetParameters(0,0,-1);
-  //   } else if (code == 14) {
-  //     _name = "nu_mu";
-  //     SetParameters(0,0,-1);
-  //   } else if (code == -14) {
-  //     _name = "anti_nu_mu";
-  //     SetParameters(0,0,-1);
-  //   }  else if (code == 16) {
-  //     _name = "nu_tau";
-  //     SetParameters(0,0,-1);
-  //   } else if (code == -16) {
-  //     _name = "anti_nu_tau";
-  //     SetParameters(0,0,-1);
-  //   } else if (code == 211) {
-  //     _name = "pi+";
-  //     SetParameters(1.3957018E-01*GeV,1,2.603e-8*second);
-  //   } else if (code == -211) {
-  //     _name = "pi-";
-  //     SetParameters(1.3957018E-01*GeV,-1,2.603e-8*second);
-  //   } else if (code == 111) {
-  //     _name = "pi0";
-  //     SetParameters(1.349766E-01*GeV,0,8.4e-17*second);
-  //   } else if (code == 321) {
-  //     _name = "kaon+";
-  //     SetParameters(4.93677E-01*GeV,1,1.2386e-8*second);
-  //   } else if (code == -321) {
-  //     _name = "kaon-";
-  //     SetParameters(4.93677E-01*GeV,-1,1.2386e-8*second);
-  //   } else if (code == 130) {
-  //     _name = "kaon0L";
-  //     SetParameters(4.97672E-01*GeV,0,5.17e-8*second);
-  //   } else if (code == 311) {
-  //     _name = "kaon0";
-  //     SetParameters(4.97672E-01*GeV,0,0.89e-10*second);
-  //   } else if (code == 2212) {
-  //     _name = "proton";
-  //     SetParameters(9.3827200E-01*GeV,1,-1);
-  //   } else if (code == -2212) {
-  //     _name = "anti_proton";
-  //     SetParameters(9.3827200E-01*GeV,-1,-1);
-  //   } else if (code == 2112) {
-  //     _name = "neutron";
-  //     SetParameters(9.3956533E-01*GeV,0,-1);
-  //   } else if (code == -2112) {
-  //     _name = "anti_neutron";
-  //     SetParameters(9.3956533E-01*GeV,0,-1);
-  //   } else if (code == 1000020040) {
-  //     _name = "alpha";
-  //     SetParameters(3.727*GeV,0,-1);
-  //   }
-  //
-  // }
-
 
   void Particle::Info(ostream& s) const
   {
@@ -233,7 +126,7 @@ namespace nuEI
     for (int i=0; i<=_daughters.GetLast(); ++i)
     {
       Particle* p = (Particle*) _daughters.At(i);
-      s << p->Name() << " with ID "	<< p->GetID << std::endl;
+      s << p->GetName() << " with ID "	<< p->GetID << std::endl;
       //   << "Mass (MeV):       " << p->GetMass()/MeV << std::endl
 	    //   << "Charge:           " << p->GetCharge()	<< std::endl
       //   << "3-momentum (MeV): " << p->GetInitialMomentum().X()/MeV << " " << p->GetInitialMomentum().Y()/MeV << " " << p->GetInitialMomentum().Z()/MeV << std::endl
@@ -254,135 +147,6 @@ namespace nuEI
 
     s << "Total track length (mm) = " << _track_length()/mm << std::endl;
   }
-  //
-  // void Particle::SetParticleName(const std::string& name)
-  // {
-  //   _name = name;
-  //
-  //   if (name == "gamma"){
-  //     SetParameters(0,0,-1);
-  //     _PDGcode = 22;
-  //   }
-  //   else if (name == "e+"){
-  //     SetParameters(5.10998902E-04*GeV,1,-1);
-  //     _PDGcode  = -11;
-  //   }
-  //   else if (name == "e-"){
-  //     SetParameters(5.10998902E-04*GeV,-1,-1);
-  //     _PDGcode  = 11;
-  //   }
-  //   else if (name == "mu-"){
-  //     SetParameters(1.05658357E-01*GeV,-1,2.197e-6*second);
-  //     _PDGcode  = 13;
-  //   }
-  //   else if (name == "mu+"){
-  //     SetParameters(1.05658357E-01*GeV,1,2.197e-6*second);
-  //     _PDGcode  = -13;
-  //   }
-  //   else if (name == "tau+"){
-  //     SetParameters(1.77699*GeV,1,291e-15*second);
-  //     _PDGcode  = -15;
-  //   }
-  //   else if (name == "tau-"){
-  //     SetParameters(1.77699*GeV,-1,2.291e-15*second);
-  //     _PDGcode  = 15;
-  //   }
-  //   else if (name == "nu_e"){
-  //     SetParameters(0,0,-1);
-  //     _PDGcode  = 12;
-  //   }
-  //   else if (name == "anti_nu_e"){
-  //     SetParameters(0,0,-1);
-  //     _PDGcode  = -12;
-  //   }
-  //   else if (name == "nu_mu"){
-  //     SetParameters(0,0,-1);
-  //     _PDGcode  = 14;
-  //   }
-  //   else if (name == "anti_nu_mu"){
-  //     SetParameters(0,0,-1);
-  //     _PDGcode = -14;
-  //   }
-  //   else if (name == "nu_tau"){
-  //     SetParameters(0,0,-1);
-  //     _PDGcode  = 16;
-  //   }
-  //   else if (name == "anti_nu_tau"){
-  //     SetParameters(0,0,-1);
-  //     _PDGcode  = -16;
-  //   }
-  //   else if (name == "pi+"){
-  //     SetParameters(1.3957018E-01*GeV,1,2.603e-8*second);
-  //     _PDGcode = 211;
-  //   }
-  //   else if (name == "pi-"){
-  //     SetParameters(1.3957018E-01*GeV,-1,2.603e-8*second);
-  //     _PDGcode  = -211;
-  //   }
-  //   else if (name == "pi0"){
-  //     SetParameters(1.349766E-01*GeV,0,8.4e-17*second);
-  //     _PDGcode  = 111;
-  //   }
-  //   else if (name == "kaon+"){
-  //     SetParameters(4.93677E-01*GeV,1,1.2386e-8*second);
-  //     _PDGcode  = 321;
-  //   }
-  //   else if (name == "kaon-"){
-  //     SetParameters(4.93677E-01*GeV,-1,1.2386e-8*second);
-  //     _PDGcode  = -321;
-  //   }
-  //   else if (name == "kaon0L"){
-  //     SetParameters(4.97672E-01*GeV,0,5.17e-8*second);
-  //     _PDGcode  = 130;
-  //   }
-  //   else if (name == "kaon0"){
-  //     SetParameters(4.97672E-01*GeV,0,0.89e-10*second);
-  //     _PDGcode  = 310;
-  //   }
-  //   else if (name == "proton"){
-  //     SetParameters(9.3827200E-01*GeV,1,-1);
-  //     _PDGcode  = 2212;
-  //   }
-  //   else if (name == "anti_proton"){
-  //     SetParameters(9.3827200E-01*GeV,-1,-1);
-  //     _PDGcode  = -2212;
-  //   }
-  //   else if (name == "neutron"){
-  //     SetParameters(9.3956533E-01*GeV,0,-1);
-  //     _PDGcode  = 2112;
-  //   }
-  //   else if (name == "anti_neutron"){
-  //     SetParameters(9.3956533E-01*GeV,0,-1);
-  //     _PDGcode = -2112;
-  //   }
-  //   else if (name == "deuteron"){
-  //     SetParameters(1.875613*GeV,0,-1);
-  //     _PDGcode  = 0;
-  //   }
-  //   else if (name == "tritium"){
-  //     SetParameters(2.80925*GeV,0,-1);
-  //     _PDGcode  = 0;
-  //   }
-  //   else if (name == "alpha"){
-  //     SetParameters(3.727*GeV,0,-1);
-  //     _PDGcode  = 0;
-  //   }
-  //   else if (name == "unknown"){ // assume pion mass
-  //     SetParameters(1.3957018E-01*GeV,-1,2.603e-8*second);
-  //     _PDGcode  = 0;
-  //   }
-  //   else if (name == "void"){
-  //     SetParameters(0,0,0);
-  //     _PDGcode  = 0;
-  //   }
-  //   else {
-  //     SetParameters(0,0,-1);
-  //     _PDGcode=0;
-  //   }
-  //
-  // }
-
-
 
 } // namespace nuEI
 

@@ -31,9 +31,9 @@ namespace nuEI
     {
       _codes    [names[i]] = codes    [i];
       _names    [codes[i]] = names    [i];
-      _masses   [codes[i]] = masses   [i];
+      _masses   [codes[i]] = masses   [i] * MeV;
       _charges  [codes[i]] = charges  [i];
-      _lifetimes[codes[i]] = lifetimes[i];
+      _lifetimes[codes[i]] = lifetimes[i] * second;
     }
 
   }

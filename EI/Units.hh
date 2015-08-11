@@ -3,8 +3,8 @@
 ////  Contains a numerical definition of units.
 ////
 ////  @Author   Gonzalo Martínez Lema
-////  @Date     07/08/2015
-////  @Mofidied 07/08/2015
+////  @Date     10/08/2015
+////  @Mofidied 10/08/2015
 ////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -64,7 +64,7 @@ namespace nuEI
     static const double minute = 60 * second;
     static const double hour   = 60 * minute;
     static const double day    = 24 * hour;
-    static const double week   = 7 * day;
+    static const double week   = 7  * day;
     static const double month  = 30 * day;
     static const double year   = 365.25 * day;
 
@@ -87,14 +87,14 @@ namespace nuEI
     static const double joule = electronvolt/e_SI;
 
     // mass
-    static const double  kilogram = joule*second*second/(meter*meter);
+    static const double  kilogram = joule*second*second/meter2;
     static const double      gram = 1.0e-3*kilogram;
     static const double milligram = 1.0e-3*gram;
     static const double       ton = 1.0e+3*kilogram;
     static const double   kiloton = 1.0e+3*ton;
 
     // pressure
-    static const double pascal     = joule/meter/m2;
+    static const double pascal     = joule/meter3;
     static const double bar        = 1.0e5  * pascal;
     static const double atmosphere = 101325 * pascal;
 

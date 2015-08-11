@@ -1,4 +1,4 @@
-# nuCD# nuCD
+# nuCD
 
 A Geant4-based simulation of a cylindrical neutrino detector.
 

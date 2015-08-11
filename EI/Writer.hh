@@ -3,8 +3,8 @@
 ////  Manager to assist on writing object to file.
 ////
 ////  @Author   Gonzalo Martínez Lema
-////  @Date     08/08/2015
-////  @Mofidied 08/08/2015
+////  @Date     10/08/2015
+////  @Mofidied 10/08/2015
 ////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -13,9 +13,10 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include "Event.hh"
 
-namespace nuEI {class ParameterInfo;}
+#include <string>
+
+#include "Event.hh"
 
 namespace nuEI
 {
@@ -36,16 +37,15 @@ namespace nuEI
     bool   _isopen; // Safety flag
 
   public:
-    bool Open(const std::string filename, std::string option);
+    void Open(const std::string filename, std::string option);
     void Write(Event& event);
     void Close();
     bool IsOpen() const;
-    void WriteMetadata(ParameterInfo* mdata);
 
   }; // class Writer
 
   inline bool Writer::IsOpen() const {return _isopen;}
 
-} // end namespace nuEI
+} // namespace nuEI
 
 #endif // __nuEI_WRITER__

@@ -1,17 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 ////
 ////  @Author   Gonzalo Martínez Lema
-////  @Date     08/08/2015
-////  @Mofidied 08/08/2015
+////  @Date     10/08/2015
+////  @Mofidied 10/08/2015
 ////
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Writer.hh"
-#include "ParameterInfo.hh"
 
-#include <sys/stat.h>
-
-#include <sstream>
+//#include <sys/stat.h>
+//#include <sstream>
 
 namespace nuEI
 {
@@ -45,10 +43,10 @@ namespace nuEI
     if (stat(path.c_str(),&st) != 0)
       return false;
 */
-    _event   = 0;
-    _file    = new TFile(filename.c_str(), option.c_str());
-    _evtTree = new TTree("EventTree","nuEI event tree");
-    _evtTree->Branch("EventBranch","nuEI::Event",&_event);
+    _event = 0;
+    _file  = new TFile(filename.c_str(), option.c_str());
+    _tree  = new TTree("EventTree","nuEI event tree");
+    _tree->Branch("EventBranch","nuEI::Event",&_event);
     _isopen = true;
 }
 
@@ -67,18 +65,13 @@ namespace nuEI
   {
     _event = &event;
 
-    if (!_evtTree)
+    if (!_tree)
     std::cerr << "======================================= "
               << "Error in nuEI::Writer::Write(Event&):   "
               << "The event tree does not exist.          "
               << "======================================= " << std::endl;
 
-    _evtTree->Fill();
-  }
-
-  void Writer::WriteMetadata(ParameterInfo* mdata)
-  {
-    _evtTree->GetUserInfo()->Add(mdata);
+    _tree->Fill();
   }
 
 }

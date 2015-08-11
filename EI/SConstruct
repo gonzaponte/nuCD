@@ -1,0 +1,245 @@
+################################################################################
+####  SConstruct - Building script for nuEU
+####
+####  @Author   Gonzalo Martinez Lema
+####  @Date     10/08/2015
+####  @Modified 10/08/2015
+####
+################################################################################
+
+import os
+import atexit
+
+## File where the library and include paths are stored
+CONFIGURATION_FILE = "nuEI.conf"
+
+## Dummy default for path-like variables
+DEFAULT_PATH = '.'
+
+## pnext source code directories
+SRC_DIR = []
+
+
+config_file_str = '''#! /bin/sh
+#nuei-config
+
+
+prefix= {0}
+exec_prefix=${1}
+include_folder=${1}/include
+
+usage()
+{{
+    cat << EOF
+Usage: nuEI-config [OPTION]
+
+Known values for OPTION are:
+--prefix show installation prefix
+--include prints include path
+--libdir prints the path to the library
+--libs prints name of libraries to link against
+--help displays this help and exit
+--version print version information
+
+EOF
+
+    exit $1
+}}
+
+if test $# -eq 0; then
+    usage 1
+fi
+while test $# -gt 0; do
+    case "$1" in
+    -*=*)
+        optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'`
+        ;;
+    *)
+        optarg=
+        ;;    esac
+
+    case "$1" in
+    --prefix)
+        echo {0}
+        ;;
+
+    --version)
+        echo v0r0p0
+        exit 0
+        ;;
+
+    --help)
+        usage 0
+        ;;
+
+    --include)
+        echo -I{0}/include
+        ;;
+
+    --libdir)
+        echo -L{0}/lib
+        ;;
+
+    --libs)
+        echo -L{0}/lib -lnuei
+        ;;
+
+    *)
+        usage
+        exit 1        ;;    esac
+    shift
+done
+
+exit 0
+
+'''
+## write nuei-config file
+def write_config_file(path):
+    if not os.path.exists(path+'/bin'):
+       os.mkdir(path+'/bin')
+    file_name = path+'/bin/nuei-config'
+    file = open(file_name, 'w')
+    file.write( config_file_str.format(path,'{prefix}') )
+    file.close()
+
+###### Useful functions
+def filtered_glob(env, pattern, omit=[], ondisk=True, source=False, strings=False):
+    return filter( lambda f: os.path.basename(f.path) not in omit, env.Glob(pattern))
+
+def Abort(message):
+    """Outputs a message before exiting the script with an error."""
+    print 'scons: Build aborted.'
+    print 'scons:', message
+    Exit(1)
+
+## Generates dictionaries for ROOT classes
+def rootcint(target, source, env):
+    """Executes the ROOT dictionary generator over a list of headers."""
+    dictname = target[0]
+    headers = ""
+    for f in source:
+        headers += str(f) + " "
+
+    command = "rootcint -f %s -c -p %s" %(dictname, headers)
+    ok = os.system(command)
+    return ok
+
+## ###################################################################
+## BUILD VARIABLES
+## These variables can be used to specify (via command-line or file)
+## the location of dependencies. They are also used to store in file
+## configured values of compilation flags ($CPPPATH, $LIBS, etc.).
+
+## Create a Variables instance associated to  a file
+vars = Variables(CONFIGURATION_FILE)
+
+## Definition of the variables
+vars.AddVariables(
+
+    PathVariable('PREFIX',
+                 'Path to installation directory',
+                 DEFAULT_PATH),
+
+
+    ## The following vars shouldn't be defined by users unless they
+    ## know what they are doing.
+
+    ('CPPPATH',
+     'List of directories where the include headers are located.',
+     []),
+
+    ('LIBPATH',
+     'List of directories where the linked libraries are located.',
+     []),
+
+    ('LIBS',
+     'List of libraries to link against.',
+     [])
+
+
+    )
+
+
+## ###################################################################
+## CONFIGURE BUILD
+
+## Create a construction environment adding the build vars and
+## propagating the user's external environment
+env = Environment(variables=vars, ENV=os.environ)
+env.AddMethod(filtered_glob, "FilteredGlob");
+
+## If the LIBPATH buildvar is not defined, the configure step has
+## not been run yet
+if not env['LIBPATH']:
+
+   ## Create a Configure object that provides autoconf-like functionality
+    conf = Configure(env, conf_dir='.sconf', log_file='.sconf/sconf.log')
+
+    ## ROOT ..........................................................
+
+    try:
+        env.ParseConfig('root-config --cflags --libs')
+    except OSError:
+        Abort('ROOT headers and libraries could not be located.')
+
+     ## Check if headers are available in the path just found.
+    if not conf.CheckCXXHeader('TFile.h'):
+        Abort('ROOT headers not found.')
+
+     ## Check if libraries are available in the path just found.
+    if not conf.CheckLib(library='Core', language='CXX', autoadd=0):
+        Abort('ROOT libraries not found.')
+
+    conf.Finish()
+
+# save build variables to file
+vars.Save(CONFIGURATION_FILE, env)
+
+######################################################################
+## BUILDING nuEI
+######################################################################
+env.Append(CCFLAGS = '-g')
+env.Append(CCFLAGS = '-O2')
+####### Installation paths: #########
+idir_prefix = env['PREFIX']
+idir_lib    = env['PREFIX'] + '/lib'
+idir_inc    = env['PREFIX'] + '/include/nuEI'
+idir_bin    = env['PREFIX'] + '/bin'
+
+env['CXXCOMSTR']  = "Compiling $SOURCE"
+env['LINKCOMSTR'] = "Linking $TARGET"
+
+headers = env.FilteredGlob('*.hh', ['LinkDef.hh'])
+
+## Make a builder for ROOTCINT
+bld = Builder(action = rootcint)
+env.Append(BUILDERS = {'Rootcint' : bld})
+env.Rootcint('nueiDict.cxx',headers + ['LinkDef.hh'])
+
+## Create the library
+sourcefiles = Glob('*.cc')
+libnuEI = env.SharedLibrary(idir_lib + '/nuEI', ['nueiDict.cxx']+sourcefiles)
+
+env.Install(idir_inc, headers)
+env.Alias('install',idir_prefix)
+
+w_prefix_dir = env['PREFIX']
+
+w_prefix_dir = os.path.abspath(w_prefix_dir)
+
+## If the installation directory is the current one, find its absolute path
+if env['PREFIX'] == DEFAULT_PATH:
+   w_prefix_dir = os.getcwd()
+
+write_config_file(w_prefix_dir)
+
+env.Execute(Chmod(w_prefix_dir+'/bin/nuei-config', 0755))
+
+
+
+## To remove all the file created during installation, when -c option is used
+if GetOption("clean"):
+  env.Default('install')
+
+Clean(libnuEI, CONFIGURATION_FILE)
+Clean(libnuEI, idir_bin+'/nuei-config')

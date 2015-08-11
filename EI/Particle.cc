@@ -1,18 +1,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 ////
 ////  @Author   Gonzalo Martínez Lema
-////  @Date     08/08/2015
-////  @Mofidied 08/08/2015
+////  @Date     10/08/2015
+////  @Mofidied 10/08/2015
 ////
 ///////////////////////////////////////////////////////////////////////////////
 
-
+#include "Database.hh"
 #include "Particle.hh"
 #include "Units.hh"
-#include "Track.hh"
-
-#include <iostream>
-#include <Database.hh>
 
 ClassImp(nuEI::Particle);
 
@@ -23,18 +19,17 @@ namespace nuEI
   _mass(0), _charge(0), _lifetime(0), _track_length(0.), _primary(true),
   _initial_vertex(), _decay_vertex(), _initial_momentum(), _decay_momentum(),
   _initial_volume("Unknown"), _decay_volume("Unknown"), _creator_process("Unknown"),
-  _mother(0), _tracks(0), _daughters(0),
-  _PDG_manager()
-  {  }
+  _mother(0), _tracks(0), _daughters(0)
+  { _PDG_manager = Database::GetInstance(); }
 
   Particle::Particle(int pdg_code) :
   _particleID(0),
   _track_length(0.), _primary(true),
   _initial_vertex(), _decay_vertex(), _initial_momentum(), _decay_momentum(),
   _initial_volume("Unknown"), _decay_volume("Unknown"), _creator_process("Unknown"),
-  _mother(0), _tracks(0), _daughters(0),
-  _PDG_manager()
+  _mother(0), _tracks(0), _daughters(0)
   {
+    _PDG_manager = Database::GetInstance();
     SetPDGcode(pdg_code);
     _decay_momentum.SetXYZT(0.,0.,0.,_mass);
   }
@@ -44,10 +39,10 @@ namespace nuEI
   _track_length(0.), _primary(true),
   _initial_vertex(), _decay_vertex(), _initial_momentum(), _decay_momentum(),
   _initial_volume("Unknown"), _decay_volume("Unknown"), _creator_process("Unknown"),
-  _mother(0), _tracks(0), _daughters(0),
-  _PDG_manager()
+  _mother(0), _tracks(0), _daughters(0)
   {
-    int code = _PDG_manager.GetPDGcode(name);
+    _PDG_manager = Database::GetInstance();
+    int code = _PDG_manager->GetPDGcode(name);
     *this = Particle(code);
   }
 
@@ -56,18 +51,12 @@ namespace nuEI
     _daughters.Delete();
   }
 
-  void Particle::SetPDGcode( int code )
-  {
-    _PDGcode = code;
-    AddProperties();
-  }
-
   void Particle::AddProperties()
   {
-    _name     = _PDG_manager.GetName(_PDGcode);
-    _mass     = _PDG_manager.GetMass(_PDGcode);
-    _charge   = _PDG_manager.GetCharge(_PDGcode);
-    _lifetime = _PDG_manager.GetLifetime(_PDGcode);
+    _name     = _PDG_manager->GetName    (_PDGcode);
+    _mass     = _PDG_manager->GetMass    (_PDGcode);
+    _charge   = _PDG_manager->GetCharge  (_PDGcode);
+    _lifetime = _PDG_manager->GetLifetime(_PDGcode);
   }
 
   const Particle* Particle::GetMother() const
@@ -81,7 +70,7 @@ namespace nuEI
     return dynamic_cast<Particle*> (_mother.GetObject());
   }
 
-  void Particle::Info(ostream& s) const
+  void Particle::Info(std::ostream& s) const
   {
     s << std::endl
       << "Particle name:      " << _name       << std::endl
@@ -97,7 +86,7 @@ namespace nuEI
 
     s << "Volume:               " << _initial_volume << std::endl;
       if (_mother.GetObject())
-        s << "Mother:               " << _mother->GetName() << " with ID " << _mother.GetID() << std::endl
+        s << "Mother:               " << GetMother()->GetParticleName() << " with ID " << GetMother()->GetID() << std::endl
           << "Creator process:      " << _creator_process << std::endl;
       else
         s << "Particle is primary   " << std::endl;
@@ -126,7 +115,7 @@ namespace nuEI
     for (int i=0; i<=_daughters.GetLast(); ++i)
     {
       Particle* p = (Particle*) _daughters.At(i);
-      s << p->GetName() << " with ID "	<< p->GetID << std::endl;
+      s << p->GetParticleName() << " with ID "	<< p->GetID() << std::endl;
       //   << "Mass (MeV):       " << p->GetMass()/MeV << std::endl
 	    //   << "Charge:           " << p->GetCharge()	<< std::endl
       //   << "3-momentum (MeV): " << p->GetInitialMomentum().X()/MeV << " " << p->GetInitialMomentum().Y()/MeV << " " << p->GetInitialMomentum().Z()/MeV << std::endl
@@ -145,12 +134,12 @@ namespace nuEI
       s << *t << std::endl << std::endl;
     }
 
-    s << "Total track length (mm) = " << _track_length()/mm << std::endl;
+    s << "Total track length (mm) = " << _track_length/mm << std::endl;
   }
 
 } // namespace nuEI
 
-ostream& operator << (ostream& s, const nuEI::Particle& p) {
+std::ostream& operator << (std::ostream& s, const nuEI::Particle& p) {
   p.Info(s);
   return s;
 }

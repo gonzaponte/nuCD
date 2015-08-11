@@ -3,8 +3,8 @@
 ////  Class with the description of a particle.
 ////
 ////  @Author   Gonzalo Martínez Lema
-////  @Date     07/08/2015
-////  @Mofidied 07/08/2015
+////  @Date     10/08/2015
+////  @Mofidied 10/08/2015
 ////
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -13,11 +13,14 @@
 
 #include <string>
 #include <map>
+#include <iostream>
 
 #include <TObject.h>
 #include <TLorentzVector.h>
 #include <TRef.h>
 #include <TRefArray.h>
+
+#include "Track.hh"
 
 namespace nuEI
 {
@@ -64,17 +67,16 @@ namespace nuEI
     TRefArray _tracks;                // reference to the true hits made by the particle
     TRefArray _daughters;             // array of references to the secondary particles comming from this one
 
-    Database _PDG_manager;           // Interface with PDG database
+    Database* _PDG_manager;           // Interface with PDG database
 
-    AddProperties();                  // Set properties from PDG database
+    void AddProperties();                  // Set properties from PDG database
   public:
-    void SetParticleID(int ID);
-    int  GetParticleID() const;
+    void SetID(int ID);
+    int  GetID() const;
     void SetPDGcode(int code);
     int  GetPDGcode() const;
-    void SetName(const std::string& name);
-    void SetName(int code);
-    const std::string& GetName() const;
+    void SetParticleName(const std::string& name);
+    const std::string& GetParticleName() const;
 
     double GetMass() const;
     double GetCharge() const;
@@ -117,24 +119,24 @@ namespace nuEI
     void SetMother(Particle* mother);
     const Particle* GetMother() const;
     void AddTrack(Track* track);
-    const TRefArray GetTracks() const;
-    Track* GetTrack(const std::string& det);
-    void AddDaughter(Particle* daughter);
-    const TRefArray GetDaughters() const;
+    const TRefArray& GetTracks() const;
+    //Track* GetTrack(const std::string& det);
+    void AddDaughter( Particle* daughter);
+    const TRefArray& GetDaughters() const;
 
-    void Info(ostream& s) const;
+    void Info(std::ostream& s) const;
 
-    ClassDef(Particle,4);
+    ClassDef(Particle,1);
 
   }; // class Particle
 
   // INLINE functions
-  inline void Particle::SetParticleID(int ID) {_particleID = ID;}
-  inline int  Particle::GetParticleID() const {return _particleID;}
-  inline void Particle::SetPDGcode(int code) {_PDGcode = code;AddProperties()}
+  inline void Particle::SetID(int ID) {_particleID = ID;}
+  inline int  Particle::GetID() const {return _particleID;}
+  inline void Particle::SetPDGcode(int code) {_PDGcode = code;AddProperties();}
   inline int  Particle::GetPDGcode() const {return _PDGcode;}
-  inline void Particle::SetName( const std::string& name ) {_name = name;}
-  inline const std::string& Particle::GetName() const {return _name;}
+  inline void Particle::SetParticleName( const std::string& name ) {_name = name;}
+  inline const std::string& Particle::GetParticleName() const {return _name;}
 
   inline double Particle::GetMass()         const {return _mass;}
   inline double Particle::GetCharge()       const {return _charge;}
@@ -174,15 +176,15 @@ namespace nuEI
   inline void  Particle::SetCreatorProcess(const std::string& process){ _creator_process = process;}
   inline const std::string& Particle::GetCreatorProcess() const{ return _creator_process;}
 
-  inline void Particle::SetMother(const Particle* mother ){ _mother = mother; }
+  inline void Particle::SetMother(Particle* mother ){ _mother = mother; }
   //inline const Particle* Particle::GetMother(const Particle* mother ){ return _mother; }
-  inline void Particle::AddTrack(const Track* track ){ _tracks->AddLast(track); }
-  inline const TRefArray& Particle::GetTracks(){ return _tracks; }
-  inline void Particle::AddDaughter(const Particle* particle ){ _particles->AddLast(particle); }
-  inline const TRefArray& Particle::GetDaughters(){ return _particles; }
+  inline void Particle::AddTrack(Track* track ){ _tracks.AddLast(track); }
+  inline const TRefArray& Particle::GetTracks() const { return _tracks; }
+  inline void Particle::AddDaughter(Particle* particle ){ _daughters.AddLast(particle); }
+  inline const TRefArray& Particle::GetDaughters() const{ return _daughters; }
 
 } // namespace nuEI
 
-ostream& operator << (ostream& s, const nuEI::Particle& p);
+std::ostream& operator << (std::ostream& s, const nuEI::Particle& p);
 
 #endif // __nuEI_PARTICLE__

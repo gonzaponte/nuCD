@@ -1,15 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 ////
 ////  @Author   Gonzalo Martínez Lema
-////  @Date     07/08/2015
-////  @Mofidied 07/08/2015
+////  @Date     10/08/2015
+////  @Mofidied 10/08/2015
 ////
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "Event.hh"
-#include "SensorHit.hh"
-#include "Track.hh"
-#include "Particle.hh"
 
 ClassImp(nuEI::Event)
 
@@ -55,21 +52,6 @@ namespace nuEI
     delete _particles;
   }
 
-  void Event::AddSensorHit(SensorHit* hit)
-  {
-    _sensor_hits->AddLast(hit);
-  }
-
-  void Event::AddTrack(Track* track)
-  {
-    _tracks->AddLast(track);
-  }
-
-  void Event::AddParticle(Particle* particle)
-  {
-    _particles->AddLast(particle);
-  }
-
   void Event::Clear()
   {
     if (_sensor_hits) _sensor_hits->Delete();
@@ -78,7 +60,7 @@ namespace nuEI
     _eventID = -1;
   }
 
-  std::vector<const nuEI::Track*> Event::Tracks( std::string sensorname = "") const
+  std::vector<const nuEI::Track*> Event::Tracks( std::string sensorname ) const
   {
     std::vector<const Track*> tracks;
     bool no_filter = !(sensorname == "");//(bool)std::strcmp(sensorname,"");
@@ -93,15 +75,15 @@ namespace nuEI
   std::vector<const nuEI::Particle*> Event::Particles() const
   {
     std::vector<const Particle*> particles;
-    for (int it = 0; it <= (int)_particles.GetLast(); ++it)
+    for (int it = 0; it <= (int)_particles->GetLast(); ++it)
     {
       const Particle* particle = dynamic_cast<const Particle*> (_particles->At(it)) ;
       particles.push_back(particle);
     }
-    return parts;
+    return particles;
   }
 
-  void Event::Info(ostream& s) const
+  void Event::Info(std::ostream& s) const
   {
     s << std::endl
       << "Event number:         " << _eventID << std::endl;
@@ -115,7 +97,7 @@ namespace nuEI
 
     s << "Number of true hits:  " << Nhits                     << std::endl;
     s << "Number of sensor hits " << _sensor_hits->GetLast()+1 << std::endl;
-    s << "Number of particles   " << _particles()->GetLast()+1 << std::endl;
+    s << "Number of particles   " << _particles  ->GetLast()+1 << std::endl;
 
     s << std::endl
       << "------------------------------------" << std::endl
@@ -160,7 +142,7 @@ namespace nuEI
 
 } // namespace nuEI
 
-ostream& operator << (ostream& s, const nuEI::Event& evt) {
+std::ostream& operator << (std::ostream& s, const nuEI::Event& evt) {
   evt.Info(s);
   return s;
 }

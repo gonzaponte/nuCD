@@ -3,27 +3,24 @@
 ////  Structure of an event in nuCD. Contains all the information.
 ////
 ////  @Author   Gonzalo Martínez Lema
-////  @Date     07/08/2015
-////  @Mofidied 07/08/2015
+////  @Date     10/08/2015
+////  @Mofidied 10/08/2015
 ////
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef __nuEI_EVENT__
 #define __nuEI_EVENT__
 
-#include <iostream>
-#include <string>
-#include <vector>
-
 #include <TObject.h>
 #include <TObjArray.h>
 
-namespace nuEI
-{
-class SensorHit;
-class Track;
-class Particle;
-}
+#include <string>
+#include <vector>
+#include <iostream>
+
+#include "SensorHit.hh"
+#include "Track.hh"
+#include "Particle.hh"
 
 namespace nuEI
 {
@@ -67,7 +64,7 @@ namespace nuEI
     int GetID() const;
 
     void Clear();
-    void Info(ostream& s) const;
+    void Info(std::ostream& s) const;
 
     ClassDef(Event,1);
 
@@ -75,11 +72,15 @@ namespace nuEI
 
   // INLINE methods
   inline const TObjArray* Event::GetSensorHits() const {return _sensor_hits;}
-  inline const TObjArray* Event::GetTracks() const {return _tracks;}
-  inline const TObjArray* Event::GetParticles() const {return _particles;}
-  inline       TObjArray* Event::GetParticles() {return _particles;}
-  inline             void Event::SetID(int id) {_eventID = id;}
-  inline              int Event::GetID() const {return _eventID;}
+  inline const TObjArray* Event::GetTracks()     const {return _tracks;}
+  inline const TObjArray* Event::GetParticles()  const {return _particles;}
+  inline       TObjArray* Event::GetParticles()        {return _particles;}
+  inline             void Event::SetID(int id)         {_eventID = id;}
+  inline              int Event::GetID()         const {return _eventID;}
+
+  inline             void Event::AddSensorHit(SensorHit* hit)   {_sensor_hits->AddLast(hit);}
+  inline             void Event::AddTrack(Track* track)         {_tracks->AddLast(track);}
+  inline             void Event::AddParticle(Particle* particle){_particles->AddLast(particle);}
 
 } // namespace nuEI
 

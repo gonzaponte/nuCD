@@ -3,17 +3,18 @@
 ////  Class containing the description of a hit in a sensor of the detector.
 ////
 ////  @Author   Gonzalo Martínez Lema
-////  @Date     08/08/2015
-////  @Mofidied 08/08/2015
+////  @Date     10/08/2015
+////  @Mofidied 10/08/2015
 ////
 ///////////////////////////////////////////////////////////////////////////////
 
 #ifndef __nuEI_SENSORHIT__
 #define __nuEI_SENSORHIT__
 
-#include <iostream>
+
 #include <TObject.h>
 #include <TVector3.h>
+#include <iostream>
 
 namespace nuEI
 {
@@ -27,7 +28,7 @@ namespace nuEI
     // naming constructor
     SensorHit(std::string sensortype);
     // destructor
-    ~SensorHit();
+    ~SensorHit(){ }
 
   private:
     std::string _detector_type;                     // type of sensor
@@ -54,10 +55,10 @@ namespace nuEI
     void     SetPosition(double x, double y, double z);
     TVector3 GetPosition() const;
 
-    void               SetDetectorName(std::string);
-    const std::string& GetDetectorName() const;
+    void               SetDetectorType(std::string);
+    const std::string& GetDetectorType() const;
 
-    void Info(ostream& s) const;
+    void Info(std::ostream& s) const;
 
     ClassDef(SensorHit,1);
 
@@ -66,8 +67,8 @@ namespace nuEI
   // IN-LINE FUNCTIONS
 
   inline const std::vector<std::pair<double, int> >& SensorHit::GetWaveform() const {return _waveform;}
-  inline void     SensorHit::SetAmplitude(double amplitude) {_amplitude = amplitude;}
-  inline double   SensorHit::GetAmplitude() const {return _amplitude;}
+  inline void     SensorHit::SetAmplitude(double amplitude) {_total_counts = amplitude;}
+  inline double   SensorHit::GetAmplitude() const {return _total_counts;}
   inline void     SensorHit::SetID(int id) {_id = id;}
   inline int      SensorHit::GetID() const {return _id;}
   inline void     SensorHit::SetBinWidth(double width) {_bin_width = width;}
@@ -79,6 +80,6 @@ namespace nuEI
 
 } // end namespace nuEI
 
-ostream& operator << (ostream& s, const nuEI::SensorHit& lh);
+std::ostream& operator << (std::ostream& s, const nuEI::SensorHit& lh);
 
 #endif // __nuEI_SENSORHIT__

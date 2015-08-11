@@ -1,14 +1,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 ////
 ////  @Author   Gonzalo Martínez Lema
-////  @Date     08/08/2015
-////  @Mofidied 08/08/2015
+////  @Date     10/08/2015
+////  @Mofidied 10/08/2015
 ////
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "SensorHit.hh"
-
-#include <iomanip>
 
 ClassImp(nuEI::SensorHit)
 
@@ -24,25 +22,22 @@ namespace nuEI
   _total_counts(0), _waveform(), _position()
   {  }
 
-  SensorHit::~SensorHit()
-  {  }
-
   void SensorHit::SetSample(double amp, double time)
   {
     std::pair<double, int> sample( time, amp);
     _waveform.push_back(sample);
   }
 
-  void SensorHit::Info(ostream& s) const
+  void SensorHit::Info(std::ostream& s) const
   {
     s << "Detector type: " << _detector_type << std::endl
       << "ID:            " << _id            << std::endl
-      << "Total charge:  " << _amplitude     << std::endl;
+      << "Total charge:  " << _total_counts  << std::endl;
   }
 
 } // namespace nuEI
 
-ostream& operator << (ostream& s, const nuEI::SensorHit& sh) {
+std::ostream& operator << (std::ostream& s, const nuEI::SensorHit& sh) {
   sh.Info(s);
   return s;
 }

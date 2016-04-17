@@ -1,0 +1,14 @@
+### --------------------------------------------------------
+###  Example 1: Configuration macro
+###  $Id$
+### --------------------------------------------------------
+
+/run/verbose 0
+/event/verbose 0
+/tracking/verbose 0
+
+/Generator/nuBeam/particle e-
+/Generator/nuBeam/Emin 1.0 GeV
+/Generator/nuBeam/Emax 2.0 GeV
+
+/nexus/persistency/outputFile nu.next
